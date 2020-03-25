@@ -48,6 +48,7 @@ void boardInit(struct piece *board[8][8]) {
     }
 }
 
+//Frees allocated memory on the board.
 void freeBoard(struct piece *board[8][8]) {
     int i, j;
 

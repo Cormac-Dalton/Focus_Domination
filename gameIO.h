@@ -9,4 +9,4 @@
 
 #endif //FOCUS_DOMINATION_GAMEIO_H
 
-void printBoard(struct piece *board[8][8]);
+void printBoard(square board[BOARD_SIZE][BOARD_SIZE]);

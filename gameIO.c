@@ -6,33 +6,24 @@
 #include "gameIO.h"
 
 //Prints the game board at any position in the game.
-void printBoard(struct piece *board[8][8]) {
-    int x, y; //Represent the x and y axises on the board. 0 is above 7 on the y axis. 0 is on the left of 7 on the x axis.
+void printBoard(square board[BOARD_SIZE][BOARD_SIZE]) {
+    int x, y;
 
-    //Cycles through every position on the board
-    for(y = 0; y < 8; y++) {
-        for(x = 0; x < 8; x++) {
-            if(board[x][y] != NULL) { //If the pointer at [x][y] is null, whitespace is printed.
-                //Checks the colour value (or lack of thereof) in board and prints the corresponding symbol
-                switch(board[x][y]->colour) {
-                    case red:
-                        printf("R  "); //Red piece on top
-                        break;
-                    case green:
-                        printf("G  "); //Green piece on top.
-                        break;
-                    case none:
-                        printf("+  "); //Empty tile. Contains no pieces.
-                        break;
-                    default:
-                        printf("?  "); //Error symbol. Should not occur unless something is broken.
-                        break;
+    printf("****** The Board ******\n");
+    for(y = 0; y < BOARD_SIZE; y ++){
+        for (x = 0; x < BOARD_SIZE; x++){
+            if(board[x][y].type == VALID) {
+                if(board[x][y].stack == NULL)
+                    printf("| + ");
+                else{
+                    if (board[x][y].stack->pieceColour == GREEN)
+                        printf("| G ");
+                    else printf("| R ");
                 }
             }
-            else { //Prints whitespace if pointer at [x][y] is null
-                printf("   ");
-            }
+            else
+                printf("    ");
         }
-        printf("\n"); //Newline printed after every line
+        printf("|\n");
     }
 }

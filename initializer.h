@@ -7,12 +7,29 @@
 
 #endif //FOCUS_DOMINATION_INITIALIZER_H
 
-enum Colour {red, green, none};
+#define BOARD_SIZE 8
+#define PLAYER_COUNT 2
 
-struct piece {
-    enum Colour colour;
+typedef enum colour {RED, GREEN} colour;
+
+typedef enum squareType {VALID, INVALID} squareType;
+
+typedef struct player {
+    colour playerColour;
+    int name;
+    int captured;
+    int reserve;
+}player;
+
+typedef struct piece {
+    enum colour pieceColour;
     struct piece *next;
-};
+}piece;
 
-void boardInit(struct piece *board[8][8]);
-void freeBoard(struct piece *board[8][8]);
+typedef struct square {
+    squareType type;
+    piece *stack;
+    int pieceNum;
+}square;
+
+void boardInit(square board[BOARD_SIZE][BOARD_SIZE]);

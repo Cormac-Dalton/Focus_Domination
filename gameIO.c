@@ -22,7 +22,7 @@ void printBoard(square board[BOARD_SIZE][BOARD_SIZE]) {
                 }
             }
             else
-                printf("    ");
+                printf("|   ");
         }
         printf("|\n");
     }

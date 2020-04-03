@@ -2,6 +2,8 @@
 
 int main() {
 
+    playerInit();
+
     square board[BOARD_SIZE][BOARD_SIZE];
 
     boardInit(board); //Initializes the board.

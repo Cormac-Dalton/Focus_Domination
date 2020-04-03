@@ -16,13 +16,13 @@ typedef enum squareType {VALID, INVALID} squareType;
 
 typedef struct player {
     colour playerColour;
-    int name;
+    char *name;
     int captured;
     int reserve;
 }player;
 
 typedef struct piece {
-    enum colour pieceColour;
+    colour pieceColour;
     struct piece *next;
 }piece;
 
@@ -33,3 +33,4 @@ typedef struct square {
 }square;
 
 void boardInit(square board[BOARD_SIZE][BOARD_SIZE]);
+void playerInit();

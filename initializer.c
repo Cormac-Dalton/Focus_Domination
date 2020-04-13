@@ -12,9 +12,8 @@ void setEmpty(square * s);
 void setGreen(square * s);
 void setRed(square * s);
 
-void playerInit() {
+void playerInit(player *player1, player *player2) {
     char buffer[20];
-    player *player1 = malloc(sizeof(player));
     player1->captured = 0;
     player1->reserve = 0;
 
@@ -24,7 +23,7 @@ void playerInit() {
     fgets(player1->name, 20, stdin);
     player1->name[strcspn(player1->name, "\n")] = 0;
     printf("Choose red or green.\n");
-    while(fgets(buffer, 6, stdin)) {
+    while(fgets(buffer, 7, stdin)) {
         buffer[strcspn(buffer, "\n")] = 0;
         if(strcmp(buffer, "red") != 0 && strcmp(buffer, "green") != 0) {
             printf("Invalid input. Please enter red or green.\n\n");
@@ -34,8 +33,6 @@ void playerInit() {
     }
     player1->playerColour = (strcmp(buffer, "red") == 0) ? RED : GREEN;
 
-
-    player *player2 = malloc(sizeof(player));
     player2->captured = 0;
     player2->reserve = 0;
 
@@ -44,8 +41,9 @@ void playerInit() {
     fgets(player2->name, 20, stdin);
     player2->name[strcspn(player2->name, "\n")] = 0;
 
-    printf(player1->playerColour == RED ? "Player 2 is green.\n" : "Player 2 is red.\n");
-    player2->playerColour = (strcmp(buffer, "red") == 0) ? RED : GREEN;
+    //Assigns the opposite colour to player2 and prints out what colour they were assigned to.
+    player2->playerColour = (player1->playerColour ? RED : GREEN);
+    printf(player2->playerColour == RED ? "Player 2 is red.\n" : "Player 2 is green.\n");
 }
 
 void boardInit(square board[BOARD_SIZE][BOARD_SIZE]) {

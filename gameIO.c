@@ -9,8 +9,11 @@
 void printBoard(square board[BOARD_SIZE][BOARD_SIZE]) {
     int x, y;
 
-    printf("****** The Board ******\n");
+    printf("      ****** The Board ******\n");
+    printf("    a   b   c   d   e   f   g   h \n");
+
     for(y = 0; y < BOARD_SIZE; y ++){
+        printf("%d ", y + 1);
         for (x = 0; x < BOARD_SIZE; x++){
             if(board[x][y].type == VALID) {
                 if(board[x][y].stack == NULL)

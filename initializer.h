@@ -5,10 +5,7 @@
 #ifndef FOCUS_DOMINATION_INITIALIZER_H
 #define FOCUS_DOMINATION_INITIALIZER_H
 
-#endif //FOCUS_DOMINATION_INITIALIZER_H
-
 #define BOARD_SIZE 8
-#define PLAYER_COUNT 2
 
 typedef enum colour {RED, GREEN} colour;
 
@@ -33,4 +30,8 @@ typedef struct square {
 }square;
 
 void boardInit(square board[BOARD_SIZE][BOARD_SIZE]);
-void playerInit();
+void playerInit(player *player1, player *player2);
+
+#endif //FOCUS_DOMINATION_INITIALIZER_H
+
+

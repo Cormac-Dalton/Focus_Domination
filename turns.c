@@ -8,7 +8,7 @@
 
 void getCoordinates(int *x, int *y);
 void getDirection(int *x, int *y, square board[BOARD_SIZE][BOARD_SIZE]);
-void addToStack(piece *targetStackPtr, piece **prevStackPtr);
+void addToStack(square *targetSquare, square *prevSquare);
 
 void turns(player *player1, player *player2, square board[BOARD_SIZE][BOARD_SIZE]) {
     int playerTurn = 1;
@@ -56,7 +56,7 @@ void turns(player *player1, player *player2, square board[BOARD_SIZE][BOARD_SIZE
             moves--;
         }
 
-        addToStack(board[x][y].stack, &board[previousX][previousY].stack); //The previous stack is added to the target stack.
+        addToStack(&board[x][y], &board[previousX][previousY]); //The previous stack is added to the target stack.
 
         printBoard(board);
 
@@ -111,6 +111,7 @@ void getCoordinates(int *x, int *y) {
 //Takes user direction input, and validates it. If valid, sets the coordinate values to the new coordinates
 void getDirection(int *x, int *y, square board[BOARD_SIZE][BOARD_SIZE]) {
     char buffer[3];
+    int testX = *x, testY = *y; //Temporarily hold new x and y values for testing purposes.
 
     while(fgets(buffer, 3, stdin)) {
         if(buffer[1] == '\n') { //Checks for newline. If newline not present, the input is invalid.
@@ -119,64 +120,67 @@ void getDirection(int *x, int *y, square board[BOARD_SIZE][BOARD_SIZE]) {
                 //Each case also checks if the square that is chosen is valid.
                 //If each check is passed, the coordinate value is changed and the function returns void.
                 case 'l':
-                    if(board[*x - 1][*y].type == VALID) { //Check if square to left is valid
-                        *x -= 1;
-                        return;
-                    }
-                    else {
-                        printf("You cannot move your piece in that direction. Move to a valid square on the board.\n");
-                    }
+                    testX -= 1;
                     break;
                 case 'r':
-                    if(board[*x + 1][*y].type == VALID) { //Check if square to right is valid
-                        *x += 1;
-                        return;
-                    }
-                    else {
-                        printf("You cannot move your piece in that direction. Move to a valid square on the board.\n");
-                    }
+                    testX += 1;
                     break;
                 case 'u':
-                    if(board[*x][*y - 1].type == VALID) { //Check is square above is valid
-                        *y += -1;
-                        return;
-                    }
-                    else {
-                        printf("You cannot move your piece in that direction. Move to a valid square on the board.\n");
-                    }
+                    testY -= 1;
                     break;
                 case 'd':
-                    if(board[*x][*y + 1].type == VALID) { //Check if square below is valid
-                        *y += 1;
-                        return;
-                    }
-                    else {
-                        printf("You cannot move your piece in that direction. Move to a valid square on the board.\n");
-                    }
+                    testY += 1;
                     break;
                 default:
                     printf("Invalid input. Enter a direction l, r, u, d (left, right, up, down).\n");
                     break;
+            }
+            //Checks if square is on the board.
+            if(testX >= 0 && testX <= 7 && testY >= 0 && testY <= 7) {
+                if(board[testX][testY].type == VALID) {
+                    *x = testX;
+                    *y = testY;
+                    return;
+                }
+                else {
+                    printf("You cannot move your piece in that direction. Move to a valid square on the board.\n");
+                    //Test values are restored to their original states.
+                    testX = *x;
+                    testY = *y;
+                }
+            }
+            else {
+                printf("You cannot move your piece in that direction. Move to a valid square on the board.\n");
+                //Test values are restored to their original states.
+                testX = *x;
+                testY = *y;
             }
         }
         else {
             //If no null terminator is present, the buffer must be cleared.
             scanf("%*[^\n]"); //Clears all chars except newline
             scanf("%*c"); //Clears one char, i.e. newline
+            printf("Invalid input. Enter a direction l, r, u, d (left, right, up, down).\n");
         }
     }
 }
 
-//Adds pieces to the top of the stack, geometrically speaking. In terms of code, pieces are added to the bottom. The system is FIFO.
-//The prevStackPtr points to the stack we are moving. The target stack is the stack we are moving to.
-void addToStack(piece *targetStackPtr, piece **prevStackPtr) {
-    piece *lastPiece = targetStackPtr;
+//Adds to the bottom of the stack. The system is FIFO.
+//prevSquare is the square that holds the piece being moved. targetSquare is the square being moved to.
+void addToStack(square *targetSquare, square *prevSquare) {
+    piece *lastPiece = prevSquare->stack;
 
-    //Goes to the piece at the top of the target stack.
+    //Finds the bottom of the stack being moved.
     while(lastPiece->next != NULL) {
         lastPiece = lastPiece->next;
     }
 
-    lastPiece->next = *prevStackPtr; //The top piece now points to the bottom of the previous stack.
-    *prevStackPtr = NULL; //The previous stack is now empty, and assigned NULL.
+    //Changing pointers to complete the movement of the stack. Each square contains a pointer to the top of each stack.
+    lastPiece->next = targetSquare->stack;
+    targetSquare->stack = prevSquare->stack;
+    prevSquare->stack = NULL;
+
+    //Updates number of pieces on each square
+    targetSquare->pieceNum += prevSquare->pieceNum;
+    prevSquare->pieceNum = 0;
 }

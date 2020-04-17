@@ -14,19 +14,25 @@ void popOne(square *popSquare, player *currentPlayer);
 int checkBoard(square board[BOARD_SIZE][BOARD_SIZE], int colour);
 
 void turns(player *player1, player *player2, square board[BOARD_SIZE][BOARD_SIZE]) {
-    int playerTurn = 1;
-    int winner = 0;
-    int x, y, previousX, previousY;
-    int validity;
+    int playerTurn = 1; //Number corresponds to the player who's turn it is
+    int winner = 0; //Corresponds to number of winning player
+    int x, y, previousX, previousY; //Coordinates used in moves
+    int validity; //Is 0 while invalid move is selected
     int moves = 0;
+    square *reserveSquare = calloc(1, sizeof(square)); //reserveSquare holds reserve pieces to be created.
     int i;
 
     while(winner == 0) {
-        if(checkBoard(board, (playerTurn == 1 ? player1->playerColour : player2->playerColour)) == 0) { //If player can move a piece
+        if(checkBoard(board, (int)(playerTurn == 1 ? player1->playerColour : player2->playerColour)) == 0) { //If player can move a piece
             if((playerTurn == 1 ? player1->reserve : player2->reserve) > 0) { //If there are reserve pieces
                 printf("\n%s\'s turn.\n", playerTurn == 1 ? player1->name : player2->name);
                 printf("You have %d pieces in reserve.\n", (playerTurn == 1 ? player1->reserve : player2->reserve));
-                printf("Mo");
+                printf("Enter the coordinates of a square to put a piece.\n");
+                getCoordinates(&x, &y);
+
+                reserveSquare->stack = calloc(1, sizeof(piece));
+                reserveSquare->stack->pieceColour = (playerTurn == 1 ? player1->playerColour : player2->playerColour);
+                addToStack(&board[x][y], reserveSquare);
             }
             else {
                 winner = (playerTurn == 1 ? 2 : 1); //Sets the other player as winner
@@ -82,11 +88,10 @@ void turns(player *player1, player *player2, square board[BOARD_SIZE][BOARD_SIZE
                     popOne(&board[x][y], (playerTurn == 1 ? player1 : player2));
                 }
             }
-
-            printBoard(board, *player1, *player2);
-
-            playerTurn = (playerTurn == 1) ? 2 : 1; //Alternates playerTurn variable at the end of each turn.
         }
+        printBoard(board, *player1, *player2);
+
+        playerTurn = (playerTurn == 1) ? 2 : 1; //Alternates playerTurn variable at the end of each turn.
     }
 }
 
@@ -213,8 +218,10 @@ void addToStack(square *targetSquare, square *prevSquare) {
 
 void popOne(square *popSquare, player *currentPlayer) {
     piece *nextPiece = popSquare->stack;
+    piece *prevPiece = NULL;
 
     while(nextPiece->next != NULL) {
+        prevPiece = nextPiece;
         nextPiece = nextPiece->next;
     }
 
@@ -225,6 +232,7 @@ void popOne(square *popSquare, player *currentPlayer) {
         currentPlayer->captured++;
     }
 
+    prevPiece->next = NULL;
     free(nextPiece);
     popSquare->pieceNum--;
 }

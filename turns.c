@@ -3,12 +3,15 @@
 //
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "turns.h"
 #include "gameIO.h"
 
 void getCoordinates(int *x, int *y);
 void getDirection(int *x, int *y, square board[BOARD_SIZE][BOARD_SIZE]);
 void addToStack(square *targetSquare, square *prevSquare);
+void popOne(square *popSquare, player *currentPlayer);
+int checkBoard(square board[BOARD_SIZE][BOARD_SIZE], int colour);
 
 void turns(player *player1, player *player2, square board[BOARD_SIZE][BOARD_SIZE]) {
     int playerTurn = 1;
@@ -16,51 +19,74 @@ void turns(player *player1, player *player2, square board[BOARD_SIZE][BOARD_SIZE
     int x, y, previousX, previousY;
     int validity;
     int moves = 0;
+    int i;
 
     while(winner == 0) {
-        printf("\n%s\'s turn.\n", playerTurn == 1 ? player1->name : player2->name); //Ternary operator to find name of player
-        printf("Enter the coordinates of the piece you would like to move.\n");
-        getCoordinates(&x, &y);
-
-        validity = 0;
-        while(validity == 0) {
-            if(board[x][y].type == INVALID) {
-                printf("The square %c%d is not valid.\n", x + 'a', y + 1);
-                printf("Choose another square.\n");
-                getCoordinates(&x, &y);
-            }
-            else if(board[x][y].stack == NULL) {
-                printf("This square has no pieces.\n");
-                getCoordinates(&x, &y);
-            }
-            else if(board[x][y].stack->pieceColour != (playerTurn == 1 ? player1->playerColour : player2->playerColour)) {
-                printf("That piece does not belong to you.\n");
-                printf("Choose another piece.\n");
-                getCoordinates(&x, &y);
+        if(checkBoard(board, (playerTurn == 1 ? player1->playerColour : player2->playerColour)) == 0) { //If player can move a piece
+            if((playerTurn == 1 ? player1->reserve : player2->reserve) > 0) { //If there are reserve pieces
+                printf("\n%s\'s turn.\n", playerTurn == 1 ? player1->name : player2->name);
+                printf("You have %d pieces in reserve.\n", (playerTurn == 1 ? player1->reserve : player2->reserve));
+                printf("Mo");
             }
             else {
-                validity = 1;
+                winner = (playerTurn == 1 ? 2 : 1); //Sets the other player as winner
             }
         }
+        else {
+            printf("\n%s\'s turn.\n", playerTurn == 1 ? player1->name : player2->name); //Ternary operator to find name of player
+            printf("Enter the coordinates of the piece you would like to move.\n");
+            getCoordinates(&x, &y);
 
-        //These coordinates are stored. The values x and y are updated to hold the coordinates after the move is made.
-        previousX = x;
-        previousY = y;
+            validity = 0;
+            while (validity == 0) {
+                if (board[x][y].type == INVALID) {
+                    printf("The square %c%d is not valid.\n", x + 'a', y + 1);
+                    printf("Choose another square.\n");
+                    getCoordinates(&x, &y);
+                }
+                else if (board[x][y].stack == NULL) {
+                    printf("This square has no pieces.\n");
+                    getCoordinates(&x, &y);
+                }
+                else if (board[x][y].stack->pieceColour != (playerTurn == 1 ? player1->playerColour : player2->playerColour)) {
+                    printf("That piece does not belong to you.\n");
+                    printf("Choose another piece.\n");
+                    getCoordinates(&x, &y);
+                }
+                else {
+                    validity = 1;
+                }
+            }
 
-        moves = board[x][y].pieceNum;
-        //Takes user directions as input.
-        while(moves > 0) {
-            printf("You have %d move%sleft.\n", moves, moves > 1 ? "s " : " "); //Prints number of moves. If more than one, pluralise word move.
-            printf("Your current position is %c%d. Choose a direction to move in.\n", x + 'a', y + 1);
-            getDirection(&x, &y, board); //Takes user input and validates it. Changes the coordinates using pointers to x and y.
-            moves--;
+            //These coordinates are stored. The values x and y are updated to hold the coordinates after the move is made.
+            previousX = x;
+            previousY = y;
+
+            moves = board[x][y].pieceNum;
+            //Takes user directions as input.
+            while (moves > 0) {
+                printf("You have %d move%sleft.\n", moves, moves > 1 ? "s " : " "); //Prints number of moves. If more than one, pluralise word move.
+                printf("Your current position is %c%d. Choose a direction to move in.\n", x + 'a', y + 1);
+                getDirection(&x, &y, board); //Takes user input and validates it. Changes the coordinates using pointers to x and y.
+                moves--;
+            }
+
+            //If coordinates haven't changed, nothing happens
+            if(x != previousX || y != previousY) {
+                addToStack(&board[x][y], &board[previousX][previousY]); //The previous stack is added to the target stack.
+            }
+
+            if (board[x][y].pieceNum > 5) {
+                for (i = board[x][y].pieceNum - 5; i > 0; i--) {
+                    //Removes one piece from the board. Takes the current player as second argument.
+                    popOne(&board[x][y], (playerTurn == 1 ? player1 : player2));
+                }
+            }
+
+            printBoard(board, *player1, *player2);
+
+            playerTurn = (playerTurn == 1) ? 2 : 1; //Alternates playerTurn variable at the end of each turn.
         }
-
-        addToStack(&board[x][y], &board[previousX][previousY]); //The previous stack is added to the target stack.
-
-        printBoard(board);
-
-        playerTurn = (playerTurn == 1) ? 2 : 1; //Alternates playerTurn variable at the end of each turn.
     }
 }
 
@@ -183,4 +209,41 @@ void addToStack(square *targetSquare, square *prevSquare) {
     //Updates number of pieces on each square
     targetSquare->pieceNum += prevSquare->pieceNum;
     prevSquare->pieceNum = 0;
+}
+
+void popOne(square *popSquare, player *currentPlayer) {
+    piece *nextPiece = popSquare->stack;
+
+    while(nextPiece->next != NULL) {
+        nextPiece = nextPiece->next;
+    }
+
+    if(currentPlayer->playerColour == nextPiece->pieceColour) {
+        currentPlayer->reserve++;
+    }
+    else {
+        currentPlayer->captured++;
+    }
+
+    free(nextPiece);
+    popSquare->pieceNum--;
+}
+
+//Checks the board to see if any player can make a move.
+int checkBoard(square board[BOARD_SIZE][BOARD_SIZE], int colour) {
+    int i, j;
+
+    for(i = 0; i < 8; i++) {
+        for(j = 0; j < 8; j++) {
+            if(board[i][j].type == VALID) {
+                if(board[i][j].stack != NULL) {
+                    if(board[i][j].stack->pieceColour == colour) {
+                        return 1; //Returns 1 if there is at least one valid move to be made
+                    }
+                }
+            }
+        }
+    }
+
+    return 0; //Returns 0 if there are no valid moves
 }

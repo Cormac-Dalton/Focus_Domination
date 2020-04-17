@@ -10,7 +10,7 @@ int main() {
 
     boardInit(board); //Initializes the board.
 
-    printBoard(board); //Prints the board.
+    printBoard(board, player1, player2); //Prints the board.
 
     turns(&player1, &player2, board);
 

@@ -9,4 +9,6 @@
 
 void printBoard(square board[BOARD_SIZE][BOARD_SIZE], player player1, player player2);
 
+void endGame(player player1, player player2, int winner);
+
 #endif //FOCUS_DOMINATION_GAMEIO_H

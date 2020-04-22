@@ -31,6 +31,7 @@ typedef struct square {
 
 void boardInit(square board[BOARD_SIZE][BOARD_SIZE]);
 void playerInit(player *player1, player *player2);
+void freeAll(player *player1, player *player2, square board[BOARD_SIZE][BOARD_SIZE]);
 
 #endif //FOCUS_DOMINATION_INITIALIZER_H
 

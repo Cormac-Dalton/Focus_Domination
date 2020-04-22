@@ -13,7 +13,7 @@ void addToStack(square *targetSquare, square *prevSquare);
 void popOne(square *popSquare, player *currentPlayer);
 int checkBoard(square board[BOARD_SIZE][BOARD_SIZE], int colour);
 
-void turns(player *player1, player *player2, square board[BOARD_SIZE][BOARD_SIZE]) {
+int turns(player *player1, player *player2, square board[BOARD_SIZE][BOARD_SIZE]) {
     int playerTurn = 1; //Number corresponds to the player who's turn it is
     int winner = 0; //Corresponds to number of winning player
     int x, y, previousX, previousY; //Coordinates used in moves
@@ -93,6 +93,8 @@ void turns(player *player1, player *player2, square board[BOARD_SIZE][BOARD_SIZE
 
         playerTurn = (playerTurn == 1) ? 2 : 1; //Alternates playerTurn variable at the end of each turn.
     }
+
+    return winner; //The number corresponds to the winning player's number
 }
 
 void getCoordinates(int *x, int *y) {

@@ -56,11 +56,12 @@ void printBoard(square board[BOARD_SIZE][BOARD_SIZE], player player1, player pla
 
 //Prints end of game screen. Shows winning player name, followed by the final scoreboard
 void endGame(player player1, player player2, int winner) {
-    printf("##############################\n");
+    printf("\n\n##############################\n");
     printf("CONGRATULATIONS.\n");
     printf("%s HAS WON THE GAME.\n", (winner == 1) ? player1.name : player2.name); //Prints name of winner
     printf("##############################\n");
 
+    //The final score is printed in the same way as the score in the print function.
     printf("\tFINAL SCORE:\n");
     if(strlen(player1.name) > 7) {
         printf("PLAYER:\t\t%s\t%s\n", player1.name, player2.name);

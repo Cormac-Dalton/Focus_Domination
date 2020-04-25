@@ -10,8 +10,6 @@ int main() {
     square board[BOARD_SIZE][BOARD_SIZE];
     boardInit(board); //Initializes the board.
 
-    printBoard(board, player1, player2); //Prints the board.
-
     winner = turns(&player1, &player2, board); //Handles each turn. Returns winner when game is over.
 
     endGame(player1, player2, winner); //Prints end game screen
